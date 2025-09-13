@@ -1,6 +1,6 @@
 {
   "name": "@neoauto-common",
-  "version": "1.0.4",
+  "version": "1.0.2",
   "description": "modulo de librerias",
   "main": "index.js",
   "scripts": {
