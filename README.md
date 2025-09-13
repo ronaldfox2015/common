@@ -12,7 +12,9 @@ docker container run --workdir /app --rm -it \
          apk add --no-cache git && \
          npm install -g npm@11.6.0 && \
          npm install -g pnpm && \
-         pnpm install"
+         pnpm add dotenv && \
+         pnpm add dotenv-expand && \
+         pnpm install && pnpm run build"
 
 docker container run --workdir /app --rm -it \
   -v "${PWD}":/app \
