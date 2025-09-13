@@ -1,99 +1,91 @@
-import { ContextModel, DataModel, LogModel, Headers } from '../../domain/model/log.model';
-import { APP, CRITICAL, INFO, TYPE, WARNING } from '../../domain/enum/logger.enum';
-import {LoggerServiceInterface} from "../../domain/repository/logger.service.interface";
-import {LogOptionalParams} from "../../domain/model/log-optional-params.interface";
+import { CRITICAL, INFO, WARNING } from '@common/domain/enum/logger.const.util'
+import { LoggerServiceInterface } from '@common/domain/model/logger-service'
+import { LogData, Context, Headers, Request as RequestType, LogParams } from '@common/domain/log-data.interface'
 
-export type LogMessage = string | object | Error;
-
-export class Logger implements LoggerServiceInterface {
-  log(message: LogMessage, ...optionalParams: LogOptionalParams[]): void {
+export class LoggerService implements LoggerServiceInterface {
+  log(message: any, ...optionalParams: LogParams[]): void {
     optionalParams.forEach((params) => {
-      if (TYPE.find((element) => element === params.method)) {
-        const logSchema = new LogModel();
-        const dataSchema = new DataModel();
-        const contextSchema = new ContextModel();
-        const modelHeaders = new Headers();
-
-        contextSchema.messageHTTP = params.parameterType;
-        contextSchema.url = decodeURIComponent(String(params.originalUrl));
-        contextSchema.method = params.method;
-        dataSchema.request = params.body;
-        modelHeaders['x-forwarded-for'] = params.headers?.['x-forwarded-for'];
-        modelHeaders['user-agent'] = params.headers?.['user-agent'];
-        modelHeaders.srv = params.headers?.srv;
-        dataSchema.header = modelHeaders;
-        contextSchema.data = dataSchema;
-        logSchema.type = INFO;
-        logSchema.resource = APP.toString();
-        logSchema.resultCode = 200;
-        logSchema.resultMessage = String(message);
-        logSchema.context = contextSchema;
-        logSchema.time = `${params.responseTime} ms`;
-        console.log(JSON.stringify(logSchema));
-      } else {
-        console.log(JSON.stringify(message));
-      }
-    });
+        const logData = this.buildLogData(params, message, INFO, 200, [])
+        console.log(JSON.stringify(logData))
+    })
   }
 
-  error(message: LogMessage, ...optionalParams: LogOptionalParams[]): void {
+  warning(message: any, ...optionalParams: any[]): void {
     optionalParams.forEach((params) => {
-      let type = CRITICAL;
-      if (params.code && params.code >= 400 && params.code < 500) {
-        type = WARNING;
-      }
-      const logSchema = new LogModel();
-      const contextSchema = new ContextModel();
-      const dataSchema = new DataModel();
-      const modelHeaders = new Headers();
-
-      contextSchema.messageHTTP = params.parameterType;
-      contextSchema.url = params.originalUrl?.toString();
-      contextSchema.method = params.method;
-      dataSchema.response = params.dataResponse;
-      dataSchema.request = params.body;
-
-      modelHeaders['x-forwarded-for'] = params.headers?.['x-forwarded-for'];
-      modelHeaders['user-agent'] = params.headers?.['user-agent'];
-      modelHeaders.srv = params.headers?.srv;
-      dataSchema.header = modelHeaders;
-
-      contextSchema.data = dataSchema;
-      logSchema.type = type;
-      logSchema.resultCode = params.code;
-      logSchema.resultMessage = params.message;
-      logSchema.context = contextSchema;
-      logSchema.trace = params.trace;
-      console.log(JSON.stringify(logSchema));
-    });
+      const status = params.status || 400
+      const logData = this.buildLogData(params, message, WARNING, status, params.trace || null)
+      console.warn(JSON.stringify(logData))
+    })
   }
 
-  /**
-   * Write a 'warn' level log.
-   */
-  warn(message: LogMessage, ...optionalParams: LogOptionalParams[]): void {
-    console.log('-----------warn----------------');
-    console.log(optionalParams);
-    console.log('---------------------------');
+  critical(message: any, ...optionalParams: any[]): void {
+    optionalParams.forEach((params) => {
+      const status = params.status || 500
+      const logData = this.buildLogData(params, message, CRITICAL, status, params.trace || null)
+      console.error(JSON.stringify(logData))
+    })
   }
 
-  /**
-   * Write a 'debug' level log.
-   */
-  debug?(message: LogMessage, ...optionalParams: LogOptionalParams[]): void {
-    console.log('----------debug-----------------');
-    console.log(message);
-    console.log(optionalParams);
-    console.log('---------------------------');
+  warn(message: any, ...optionalParams: any[]): void {
+    console.warn(JSON.stringify({ level: 'warn', message, data: optionalParams }))
   }
 
-  /**
-   * Write a 'verbose' level log.
-   */
-  verbose?(message: LogMessage, ...optionalParams: LogOptionalParams[]): void {
-    console.log('----------verbose-----------------');
-    console.log(message);
-    console.log(optionalParams);
-    console.log('---------------------------');
+  debug?(message: any, ...optionalParams: any[]): void {
+    console.debug(JSON.stringify({ level: 'debug', message, data: optionalParams }))
+  }
+
+  verbose?(message: any, ...optionalParams: any[]): void {
+    console.info(JSON.stringify({ level: 'verbose', message, data: optionalParams }))
+  }
+
+  private buildLogData(
+    params: any,
+    message: any,
+    type: string,
+    status: number,
+    trace: any,
+  ): LogData {
+    return {
+      ip: params.clientIp || 'unknown',
+      type,
+      httpCode: status,
+      message: params.message || message,
+      context: this.buildContext(params),
+      trace,
+      responseTime: this.calculateResponseTime(params.startTime),
+    }
+  }
+
+  private buildContext(params: any): Context {
+    return {
+      url: params.originalUrl || 'unknown',
+      method: params.method || 'UNKNOWN',
+      data: {
+        headers: this.buildHeaders(params.headers),
+        request: this.buildRequest(params.request),
+      },
+    }
+  }
+
+  private buildHeaders(headers: any): Headers {
+    return {
+      'x-forwarded-for': headers?.['x-forwarded-for'] || 'unknown',
+      'user-agent': headers?.['user-agent'] || 'unknown',
+      srv: headers?.['srv'] ?? null,
+    }
+  }
+
+  private buildRequest(request: any): RequestType {
+    return {
+      params: request?.params || {},
+      query: request?.query || null,
+      body: request?.body || null,
+    }
+  }
+
+  private calculateResponseTime(startTime?: number): string {
+    if (!startTime) return '0 ms'
+    const duration = Date.now() - startTime
+    return `${duration} ms`
   }
 }

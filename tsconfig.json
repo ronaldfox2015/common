@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",                     // Importante para los paths relativos al proyecto
+    "paths": {
+      "@common/*": ["./*"]              // Apunta directamente al raíz del proyecto
+    },
+    "target": "ES6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strict": true,
+    "outDir": "dist",
+    "skipLibCheck": true
+  },
+  "include": ["**/*.ts"],               // Incluye todos los .ts del proyecto
+  "exclude": ["node_modules", "dist"]
+}
