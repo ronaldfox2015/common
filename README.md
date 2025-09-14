@@ -37,6 +37,7 @@ docker container run --workdir /app --rm -it \
          npm install -g pnpm && \
          pnpm add dotenv && \
          pnpm add dotenv-expand && \
-         pnpm install && pnpm run build && \
-         pnpm version v1.4.0
+         pnpm install && pnpm run build && \ 
+         pnpm run build && \
+         pnpm publish --access public
          "
