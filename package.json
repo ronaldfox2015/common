@@ -1,8 +1,7 @@
 {
   "name": "@neoauto-common",
-  "version": "v1.4.0",
+  "version": "v1.5.0",
   "description": "modulo de librerias",
-  "main": "index.js",
   "scripts": {
     "test": "jest",
     "build": "tsc"
@@ -26,6 +25,8 @@
       ]
     }
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": ["dist"],
   "devDependencies": {
     "@types/jest": "^30.0.0",

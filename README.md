@@ -26,3 +26,17 @@ docker container run --workdir /app --rm -it \
          pnpm add -D ts-node && \
          pnpm add -D jest ts-jest @types/jest typescript && \
          pnpm install && pnpm test"
+
+
+docker container run --workdir /app --rm -it \
+  -v "${PWD}":/app \
+  node:22.14.0-alpine3.20 \
+  sh -c "apk update && apk upgrade && \
+         apk add --no-cache git && \
+         npm install -g npm@11.6.0 && \
+         npm install -g pnpm && \
+         pnpm add dotenv && \
+         pnpm add dotenv-expand && \
+         pnpm install && pnpm run build && \
+         pnpm version v1.4.0
+         "
