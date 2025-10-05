@@ -1,35 +1,23 @@
 {
   "name": "@bdd-backend/common",
   "version": "v1.8.2",
-  "description": "modulo de librerias",
+  "description": "módulo de librerías",
+  "main": "dist/index.js",
+  "types": "dist/index.ts",
+  "files": ["dist"],
   "scripts": {
-    "test": "jest",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ronaldfox2015/common.git"
   },
-  "author": "",
-  "license": "ISC",
   "bugs": {
     "url": "https://github.com/ronaldfox2015/common/issues"
   },
-  "rootDir": ".",
   "homepage": "https://github.com/ronaldfox2015/common#readme",
-  "compilerOptions": {
-    "baseUrl": "*",
-    "paths": {
-      "@common/*": [
-        "*"
-      ]
-    }
-  },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
+  "license": "ISC",
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "jest": "^30.1.3",
