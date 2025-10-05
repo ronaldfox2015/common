@@ -41,3 +41,12 @@ docker container run --workdir /app --rm -it \
          pnpm run build && \
          pnpm publish --access public
          "
+
+docker container run --workdir /app --rm -it \
+  -v "${PWD}":/app \
+  node:22.14.0-alpine3.20 \
+  sh -c "apk update && apk upgrade && \
+         apk add --no-cache git && \
+         npm install -g npm@11.6.0 && \
+         npm install -g pnpm && \
+         pnpm add sequelize sequelize-typescript mysql2 axios"
