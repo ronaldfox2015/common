@@ -1,6 +1,6 @@
 {
-  "name": "@neoauto/common",
-  "version": "v1.5.0",
+  "name": "@bdd-backend/common",
+  "version": "v1.8.0",
   "description": "modulo de librerias",
   "scripts": {
     "test": "jest",

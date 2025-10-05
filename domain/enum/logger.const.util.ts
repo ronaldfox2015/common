@@ -1,6 +1,6 @@
 export const INFO = 'INFO'
 export const CRITICAL = 'CRITICAL'
 export const WARNING = 'WARNING'
-export const APP = 'clientGateway'
+export const APP = 'API'
 export const REQUEST = 'request'
 export const RESPONSE = 'response'
