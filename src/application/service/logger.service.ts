@@ -1,16 +1,16 @@
-import { CRITICAL, INFO, WARNING } from '@common/domain/enum/logger.const.util'
-import { LoggerServiceInterface } from '@common/domain/model/logger-service'
-import { LogData, Context, Headers, Request as RequestType, LogParams } from '@common/domain/log-data.interface'
+import { INFO, WARNING, CRITICAL } from './../../domain/enum/logger.const.util'
+import { LogParams, LogData, Context, Headers, RequestData, HeadersInput } from './../../domain/log-data.interface'
+import { LoggerServiceInterface } from './../../domain/model/logger-service'
 
 export class LoggerService implements LoggerServiceInterface {
   log(message: any, ...optionalParams: LogParams[]): void {
     optionalParams.forEach((params) => {
-        const logData = this.buildLogData(params, message, INFO, 200, [])
-        console.log(JSON.stringify(logData))
+      const logData = this.buildLogData(params, message, INFO, 200, [])
+      console.log(JSON.stringify(logData))
     })
   }
 
-  warning(message: any, ...optionalParams: any[]): void {
+  warning(message: any, ...optionalParams: LogParams[]): void {
     optionalParams.forEach((params) => {
       const status = params.status || 400
       const logData = this.buildLogData(params, message, WARNING, status, params.trace || null)
@@ -18,7 +18,7 @@ export class LoggerService implements LoggerServiceInterface {
     })
   }
 
-  critical(message: any, ...optionalParams: any[]): void {
+  critical(message: any, ...optionalParams: LogParams[]): void {
     optionalParams.forEach((params) => {
       const status = params.status || 500
       const logData = this.buildLogData(params, message, CRITICAL, status, params.trace || null)
@@ -38,13 +38,7 @@ export class LoggerService implements LoggerServiceInterface {
     console.info(JSON.stringify({ level: 'verbose', message, data: optionalParams }))
   }
 
-  private buildLogData(
-    params: any,
-    message: any,
-    type: string,
-    status: number,
-    trace: any,
-  ): LogData {
+  private buildLogData(params: LogParams, message: any, type: string, status: number, trace: any): LogData {
     return {
       ip: params.clientIp || 'unknown',
       type,
@@ -56,7 +50,7 @@ export class LoggerService implements LoggerServiceInterface {
     }
   }
 
-  private buildContext(params: any): Context {
+  private buildContext(params: LogParams): Context {
     return {
       url: params.originalUrl || 'unknown',
       method: params.method || 'UNKNOWN',
@@ -67,19 +61,19 @@ export class LoggerService implements LoggerServiceInterface {
     }
   }
 
-  private buildHeaders(headers: any): Headers {
+  private buildHeaders(headers?: HeadersInput): Headers {
     return {
       'x-forwarded-for': headers?.['x-forwarded-for'] || 'unknown',
       'user-agent': headers?.['user-agent'] || 'unknown',
-      srv: headers?.['srv'] ?? null,
+      srv: headers?.srv ?? null,
     }
   }
 
-  private buildRequest(request: any): RequestType {
+  private buildRequest(request?: RequestData): RequestData {
     return {
       params: request?.params || {},
-      query: request?.query || null,
-      body: request?.body || null,
+      query: request?.query || {},
+      body: request?.body || {},
     }
   }
 

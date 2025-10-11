@@ -16,21 +16,19 @@ export interface Context {
 
 export interface ContextData {
   headers: Headers;
-  request: Request;
+  request: RequestData;
 }
 
 export interface Headers {
-  "x-forwarded-for": string;
-  "user-agent": string;
+  'x-forwarded-for': string | 'unknown' | undefined
+  'user-agent': string |  'unknown'
   srv: string | null;
 }
 
 export interface Request {
-  params: {
-    id: string;
-  };
-  query: any;
-  body: any;
+  params: any | {}
+  query: any | {}
+  body: any | {}
 }
 
 export interface LogParams {
@@ -57,3 +55,13 @@ export interface LogParams {
   startTime?: number;
 }
 
+export interface RequestData {
+  params?: Record<string, any>
+  query?: Record<string, any>
+  body?: any
+}
+
+
+export interface HeadersInput extends Partial<Headers> {
+  [key: string]: any
+}
