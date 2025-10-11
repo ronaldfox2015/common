@@ -1,6 +1,6 @@
 {
   "name": "@bdd-backend/common",
-  "version": "v1.10.4",
+  "version": "v1.11.0",
   "description": "módulo de librerías",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
