@@ -1,9 +1,9 @@
 {
   "name": "@bdd-backend/common",
-  "version": "v1.10.3",
+  "version": "v1.10.4",
   "description": "módulo de librerías",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": ["dist"],
   "scripts": {
     "build": "tsc",
