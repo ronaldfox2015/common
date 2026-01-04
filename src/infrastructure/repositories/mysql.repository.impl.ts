@@ -4,7 +4,6 @@ export class MysqlRepositoryImpl<T extends Model> {
   protected readonly model: ModelCtor<T>;
 
   constructor(sequelize: Sequelize, model: ModelCtor<T>) {
-    // Registramos el modelo si no está cargado
     if (!sequelize.isDefined(model.name)) {
       sequelize.addModels([model]);
     }

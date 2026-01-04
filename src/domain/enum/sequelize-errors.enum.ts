@@ -1,0 +1,17 @@
+export enum SequelizeInternalErrorNames {
+  AccessDenied = 'SequelizeAccessDeniedError',
+  Connection = 'SequelizeConnectionError',
+  ConnectionRefused = 'SequelizeConnectionRefusedError',
+  HostNotFound = 'SequelizeHostNotFoundError',
+  Timeout = 'SequelizeTimeoutError',
+  Database = 'SequelizeDatabaseError',
+  AxiosError = 'AxiosError',
+  HttpException = 'HttpException',
+  ReferenceError = 'ReferenceError',
+  TypeError = 'TypeError',
+  Error = 'Error',
+  NotFoundException = 'NotFoundException',
+  BadRequestException = 'BadRequestException',
+  ConnectionTimeoutError = 'ConnectionTimeoutError',
+  BadRequestInfrastructureException = 'BadRequestInfrastructureException',
+}

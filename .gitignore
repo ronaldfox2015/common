@@ -1,5 +1,6 @@
 # compiled output
 /dist
+/__tests__/*
 /node_modules
 .pnpm-store/
 pnpm-lock.yaml

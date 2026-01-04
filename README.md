@@ -23,9 +23,9 @@ docker container run --workdir /app --rm -it \
          apk add --no-cache git && \
          npm install -g npm@11.6.0 && \
          npm install -g pnpm && \
-         pnpm add -D ts-node && \
-         pnpm add -D jest ts-jest @types/jest typescript && \
-         pnpm install && pnpm test"
+         pnpm store prune && \
+         pnpm update ts-node jest && \
+         pnpm install "
 
 
 docker container run --workdir /app --rm -it \
@@ -49,4 +49,4 @@ docker container run --workdir /app --rm -it \
          apk add --no-cache git && \
          npm install -g npm@11.6.0 && \
          npm install -g pnpm && \
-         pnpm add sequelize sequelize-typescript mysql2 axios"
+         pnpm add sequelize sequelize-typescript mysql2 axios && pnpm test"

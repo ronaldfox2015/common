@@ -1,17 +1,16 @@
 import * as dotenv from 'dotenv'
 import * as dotenvExpand from 'dotenv-expand'
-import { DotenvExpandOutput } from 'dotenv-expand'
 import { type ConfigService } from '../../domain/config-service'
 
 export class ConfigServiceImplement implements ConfigService {
-  private readonly envConfig: DotenvExpandOutput
+  private readonly envConfig: Record<string, string>
 
-  constructor() {
-    this.envConfig = dotenvExpand.expand(dotenv.config({ path: '.env' }))
+  constructor(envPath = '.env') {
+    const config = dotenvExpand.expand(dotenv.config({ path: envPath }))
+    this.envConfig = config.parsed || {}
   }
 
   public get(key: string): string {
-    const env = this.envConfig.parsed
-    return env === undefined ? '' : env[key]
+    return this.envConfig[key] || ''
   }
 }
