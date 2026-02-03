@@ -1,7 +1,15 @@
 {
     "$schema": "node_modules/lerna/schemas/lerna-schema.json",
-    "version": "*",
-    "packages": [
-        "packages/*"
-    ]
+    "version": "independent",
+    "npmClient": "pnpm",
+    "command": {
+        "version": {
+            "allowBranch": [
+                "main",
+                "feature/*",
+                "bugfix/*"
+            ],
+            "message": "chore: publish release"
+        }
+    }
 }
