@@ -11,10 +11,10 @@ export function CachApplicationErrorsDecorator(defaultValue: any) {
         if (e.status == 500) {
           throw new ApplicationException(e.response, e.status);
         }
-        if (defaultValue !== undefined) {
-          return defaultValue
+        if (defaultValue !== undefined || defaultValue !== '') {
+          return defaultValue;
         }
-        throw new ApplicationException(e.response, e.status);
+        throw new ApplicationException(e.message, e.status);
       }
     }
 
