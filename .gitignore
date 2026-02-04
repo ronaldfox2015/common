@@ -3,7 +3,7 @@
 /__tests__/*
 /node_modules
 .pnpm-store/
-pnpm-lock.yaml
+
 # Logs
 logs
 *.log
