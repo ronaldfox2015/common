@@ -1,6 +1,5 @@
 # compiled output
 /dist
-/__tests__/*
 /node_modules
 .pnpm-store/
 
@@ -19,7 +18,7 @@ yarn.lock
 # Tests
 /coverage
 /.nyc_output
-
+credentials
 # IDEs and editors
 /.idea
 .project

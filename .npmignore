@@ -1,4 +1,4 @@
-tests/
+test/
 jest.config.ts
 tsconfig.json
 *.test.ts
