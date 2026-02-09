@@ -60,7 +60,7 @@ pnpm run test:verbose
 ```bash
 # Run tests in Docker container
 docker container run --workdir /app --rm -it \         
-  -v "${PWD}":/app \
+  -v "${pwd}":/app \
   node:22.14.0-alpine3.20 \
   sh -c "apk update && apk upgrade && \
          apk add --no-cache git && \

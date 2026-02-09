@@ -1,7 +1,7 @@
 ## CONTAINER VARS ##
 ENV                 ?= dev
 INFRA_BUCKET        ?= infraestructura.neoauto.$(ENV)
-APP_DIR             = .
+APP_DIR             = /app
 DEPLOY_REGION       ?= us-east-1
 PROFILE             = --profile $(ENV)
 ACCOUNT_ID          ?= 558705146899
