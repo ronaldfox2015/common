@@ -1,7 +1,7 @@
 ## CONTAINER VARS ##
 ENV                 ?= dev
 INFRA_BUCKET        ?= infraestructura.neoauto.$(ENV)
-APP_DIR             = app
+APP_DIR             = .
 DEPLOY_REGION       ?= us-east-1
 PROFILE             = --profile $(ENV)
 ACCOUNT_ID          ?= 558705146899
@@ -58,16 +58,17 @@ get_configs:
 	$(shell echo '//registry.npmjs.org/:_authToken=$(NPM_TOKEN_PP)' > $(PWD)/.npmrc)
 
 publish-packages: ##@Global Publish monorepo packages
-	@make get_configs
+	make get_configs
 	docker run \
 		-it \
 		--rm \
 		-w /$(APP_DIR) \
 		-v $(PWD):/$(APP_DIR) \
 		-v ~/.gitconfig:/etc/gitconfig \
+		-v ~/.ssh:/root/.ssh \
 		$(IMAGE_BUILD) \
 		sh -c "apk update && apk upgrade && \
-		apk add --no-cache git && \
+		apk add --no-cache git openssh && \
 		npm install -g npm@11.6.0 && \
 		npm install -g pnpm && \
 		pnpm publish:packages"

@@ -5,7 +5,7 @@ This test suite provides comprehensive coverage for the Common library, testing 
 
 ## Test Structure
 ```
-src/__tests__/
+src/test/
 ├── application/
 │   ├── exceptions/
 │   │   └── application.exception.test.ts
