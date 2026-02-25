@@ -5,6 +5,7 @@
     "lib": [
       "ES2020"
     ],
+    "types": ["node"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strict": true,

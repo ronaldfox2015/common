@@ -7,21 +7,26 @@ describe('CatchInfrastructureErrors', () => {
   class TestClass {
     @CatchInfrastructureErrors('Custom error message')
     async methodWithCustomMessage() {
-      throw new BadRequestInfrastructureException("Original error");
+      throw new Error("Original error");
     }
 
     @CatchInfrastructureErrors()
     async methodWithDefaultMessage() {
-      throw new BadRequestInfrastructureException("Original error");
+      throw new Error("Original error");
     }
 
-    @CatchInfrastructureErrors('Sequelize error')
-    async methodWithSequelizeError() {
-      const error = new BadRequestInfrastructureException(
-        "Database connection failed"
-      );
-      error.name = SequelizeInternalErrorNames.Connection
-      throw error
+    @CatchInfrastructureErrors('Database error')
+    async methodWithConnectionError() {
+      const error = new Error("Database connection failed");
+      error.name = SequelizeInternalErrorNames.Connection;
+      throw error;
+    }
+
+    @CatchInfrastructureErrors('Database error')
+    async methodWithDatabaseError() {
+      const error = new Error("Query failed");
+      error.name = SequelizeInternalErrorNames.Database;
+      throw error;
     }
 
     @CatchInfrastructureErrors('Success method')
@@ -33,6 +38,20 @@ describe('CatchInfrastructureErrors', () => {
     async methodWithAxiosError() {
       const error = new Error('Network error')
       error.name = SequelizeInternalErrorNames.AxiosError
+      throw error
+    }
+
+    @CatchInfrastructureErrors('Validation error')
+    async methodWithValidationError() {
+      const error = new Error('Unique constraint violation')
+      error.name = SequelizeInternalErrorNames.SequelizeUniqueConstraintError
+      throw error
+    }
+
+    @CatchInfrastructureErrors('Network error')
+    async methodWithNetworkError() {
+      const error: any = new Error('Connection refused')
+      error.code = 'ECONNREFUSED'
       throw error
     }
   }
@@ -50,12 +69,8 @@ describe('CatchInfrastructureErrors', () => {
       await testInstance.methodWithCustomMessage()
     } catch (error) {
       expect(error).toBeInstanceOf(BadRequestInfrastructureException)
-      expect((error as BadRequestInfrastructureException).message).toContain(
-        "[BaseException] Custom error message: [BaseException] Original error"
-      );
-      expect((error as BadRequestInfrastructureException).code).toBe(
-        HttpStatus.BAD_REQUEST
-      );
+      expect((error as BadRequestInfrastructureException).message).toContain('Custom error message');
+      expect((error as BadRequestInfrastructureException).code).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   })
 
@@ -66,31 +81,68 @@ describe('CatchInfrastructureErrors', () => {
       await testInstance.methodWithDefaultMessage()
     } catch (error) {
       expect(error).toBeInstanceOf(BadRequestInfrastructureException)
-      expect((error as BadRequestInfrastructureException).message).toContain(
-        "[BaseException] Infrastructure error: [BaseException] Original error"
-      );
+      expect((error as BadRequestInfrastructureException).message).toContain('Infrastructure error');
+      expect((error as BadRequestInfrastructureException).code).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   })
 
-  it('should set INTERNAL_SERVER_ERROR code for Sequelize errors', async () => {
-    await expect(testInstance.methodWithSequelizeError()).rejects.toThrow(BadRequestInfrastructureException)
+  it('should categorize connection errors with proper message prefix', async () => {
+    await expect(testInstance.methodWithConnectionError()).rejects.toThrow(BadRequestInfrastructureException)
 
     try {
-      await testInstance.methodWithSequelizeError()
+      await testInstance.methodWithConnectionError()
     } catch (error) {
       expect(error).toBeInstanceOf(BadRequestInfrastructureException)
-      expect((error as BadRequestInfrastructureException).code).toBe(HttpStatus.INTERNAL_SERVER_ERROR)
+      expect((error as BadRequestInfrastructureException).message).toContain('Connection error:');
+      expect((error as BadRequestInfrastructureException).code).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   })
 
-  it('should set INTERNAL_SERVER_ERROR code for Axios errors', async () => {
+  it('should categorize database errors with proper message prefix', async () => {
+    await expect(testInstance.methodWithDatabaseError()).rejects.toThrow(BadRequestInfrastructureException)
+
+    try {
+      await testInstance.methodWithDatabaseError()
+    } catch (error) {
+      expect(error).toBeInstanceOf(BadRequestInfrastructureException)
+      expect((error as BadRequestInfrastructureException).message).toContain('Connection error:');
+      expect((error as BadRequestInfrastructureException).code).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  })
+
+  it('should categorize Axios errors with proper message prefix', async () => {
     await expect(testInstance.methodWithAxiosError()).rejects.toThrow(BadRequestInfrastructureException)
 
     try {
       await testInstance.methodWithAxiosError()
     } catch (error) {
       expect(error).toBeInstanceOf(BadRequestInfrastructureException)
-      expect((error as BadRequestInfrastructureException).code).toBe(HttpStatus.INTERNAL_SERVER_ERROR)
+      expect((error as BadRequestInfrastructureException).message).toContain('External service error:');
+      expect((error as BadRequestInfrastructureException).code).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  })
+
+  it('should categorize validation errors with proper message prefix', async () => {
+    await expect(testInstance.methodWithValidationError()).rejects.toThrow(BadRequestInfrastructureException)
+
+    try {
+      await testInstance.methodWithValidationError()
+    } catch (error) {
+      expect(error).toBeInstanceOf(BadRequestInfrastructureException)
+      expect((error as BadRequestInfrastructureException).message).toContain('Validation error:');
+      expect((error as BadRequestInfrastructureException).code).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  })
+
+  it('should categorize network errors with proper message prefix', async () => {
+    await expect(testInstance.methodWithNetworkError()).rejects.toThrow(BadRequestInfrastructureException)
+
+    try {
+      await testInstance.methodWithNetworkError()
+    } catch (error) {
+      expect(error).toBeInstanceOf(BadRequestInfrastructureException)
+      expect((error as BadRequestInfrastructureException).message).toContain('Network error:');
+      expect((error as BadRequestInfrastructureException).code).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   })
 
@@ -125,5 +177,29 @@ describe('CatchInfrastructureErrors', () => {
 
     const instance = new ErrorTestClass()
     await expect(instance.methodWithNoNameError()).rejects.toThrow(BadRequestInfrastructureException)
+    
+    try {
+      await instance.methodWithNoNameError()
+    } catch (error) {
+      expect((error as BadRequestInfrastructureException).code).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   })
+
+  it('should always return 500 status code for all infrastructure errors', async () => {
+    const methods = [
+      testInstance.methodWithCustomMessage(),
+      testInstance.methodWithConnectionError(),
+      testInstance.methodWithAxiosError(),
+      testInstance.methodWithValidationError(),
+      testInstance.methodWithNetworkError()
+    ];
+
+    for (const method of methods) {
+      try {
+        await method;
+      } catch (error) {
+        expect((error as BadRequestInfrastructureException).code).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+  });
 })

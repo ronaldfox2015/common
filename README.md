@@ -10,6 +10,15 @@ npm install @bdd-backend/common
 pnpm add @bdd-backend/common
 ```
 
+## Cambios Recientes (v1.15.3)
+
+- ✅ Corregido nombre del decorador: `CatchApplicationErrorsDecorator` (antes `CachApplicationErrorsDecorator`)
+- ✅ Mejorado manejo de errores en `CatchInfrastructureErrors`: todos los errores retornan código 500 con mensajes segmentados
+- ✅ Actualizado `CatchApplicationErrorsDecorator`: convierte errores 500+ a 400 automáticamente
+- ✅ Eliminados warnings de parámetros no utilizados en decoradores
+- ✅ Actualizado `tsconfig.json` para incluir tipos de Node.js
+- ✅ Tests actualizados para reflejar el nuevo comportamiento
+
 ## Estructura del Proyecto
 
 ```
@@ -64,22 +73,23 @@ logger.critical('Error crítico', {
 });
 ```
 
-#### CachApplicationErrorsDecorator
-Decorador para capturar errores en métodos de aplicación.
+#### CatchApplicationErrorsDecorator
+Decorador para capturar errores en métodos de aplicación. Convierte errores 500+ a 400 y permite valores por defecto.
 
 ```typescript
-import { CachApplicationErrorsDecorator } from '@bdd-backend/common';
+import { CatchApplicationErrorsDecorator } from '@bdd-backend/common';
 
 class UserService {
-  @CachApplicationErrorsDecorator('Usuario por defecto')
+  @CatchApplicationErrorsDecorator('Usuario por defecto')
   async getUser(id: string) {
-    // Si falla, retorna 'Usuario por defecto'
+    // Si falla con error 400-499, retorna 'Usuario por defecto'
     return await this.userRepository.findById(id);
   }
 
-  @CachApplicationErrorsDecorator(undefined)
+  @CatchApplicationErrorsDecorator()
   async createUser(userData: any) {
-    // Si falla, lanza ApplicationException
+    // Si falla con error 500+, lo convierte a 400
+    // Si falla con error 400-499, lanza ApplicationException
     return await this.userRepository.create(userData);
   }
 }
@@ -196,7 +206,7 @@ class CustomException extends BaseException {
 ```
 
 #### CatchInfrastructureErrors
-Decorador para capturar errores de infraestructura.
+Decorador para capturar errores de infraestructura. Todos los errores retornan código 500 con mensajes segmentados por tipo.
 
 ```typescript
 import { CatchInfrastructureErrors } from '@bdd-backend/common';
@@ -204,7 +214,11 @@ import { CatchInfrastructureErrors } from '@bdd-backend/common';
 class DatabaseService {
   @CatchInfrastructureErrors('Error al conectar con la base de datos')
   async connect() {
-    // Captura errores de Sequelize, Axios, etc.
+    // Captura errores de Sequelize, Axios, conexión, etc.
+    // Errores de conexión: "Connection error: ..."
+    // Errores de BD: "Database error: ..."
+    // Errores de red: "Network error: ..."
+    // Todos retornan código 500
     return await this.sequelize.authenticate();
   }
 
