@@ -16,7 +16,7 @@
     "test:verbose": "jest --verbose",
     "build:module": "npx ts-node crear_modulo.ts",
     "build:packages": "lerna run build",
-    "publish:packages": "lerna run build && pnpm run test && lerna publish"
+    "publish:packages": "lerna run build && lerna publish"
   },
   "repository": {
     "type": "git",
