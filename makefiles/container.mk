@@ -31,6 +31,7 @@ build: ##@Local Build static files of papyrum website
 		apk add --no-cache git && \
 		npm install -g npm@11.6.0 && \
 		npm install -g pnpm && \
+		pnpm install && \
 		pnpm build"
 
 build-packages: ##@Global Build dist of each monorepo package
